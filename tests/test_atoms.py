@@ -261,7 +261,6 @@ def test_can_create_data_from_atoms():
     pyrrolate_path = 'data/pyrrolate.out'
     pyrrolate_mol = read_cclib(pyrrolate_path)
 
-    empty_mol = Atoms({})
 
     dioxygen_name = 'dioxygen'
     dioxygen_atomcoords = [[0., 0., 0.], [0., 0., 1.21]]
@@ -285,11 +284,7 @@ def test_can_create_data_from_atoms():
         'charge': cyanide_charge,
     })
 
-    data = create_data([pyrrole_mol,
-                        pyrrolate_mol,
-                        empty_mol,
-                        dioxygen_mol,
-                        cyanide_mol])
+    data = create_data(pyrrole, pyrrolate, dioxygen, cyanide)
 
     assert_equal(data.loc[pyrrole_name, 'jobfilename'], pyrrole_path)
     assert_array_equal(data.loc[pyrrole_name, 'atomnos'],
@@ -302,8 +297,6 @@ def test_can_create_data_from_atoms():
                        [6, 6, 6, 6, 7, 1, 1, 1, 1])
     assert_equal(data.loc[pyrrolate_path, 'charge'], -1.)
     assert_equal(data.loc[pyrrolate_path, 'mult'], 1.)
-
-    assert(np.all(pd.isna(data.loc[np.nan])))
 
     assert(pd.isna(data.loc[dioxygen_name, 'jobfilename']))
     assert_allclose(data.loc[dioxygen_name, 'atomcoords'][-1],
@@ -318,6 +311,183 @@ def test_can_create_data_from_atoms():
     assert_array_equal(data.loc[cyanide_name, 'atomnos'], cyanide_atomnos)
     assert_equal(data.loc[cyanide_name, 'charge'], cyanide_charge)
     assert(pd.isna(data.loc[cyanide_name, 'mult']))
+
+
+def test_can_create_data_from_series():
+    """Test if we can create a data object from Series instances."""
+    pyrrole_path = 'data/pyrrole.out'
+    pyrrolate_path = 'data/pyrrolate.out'
+
+    data1 = create_data(read_cclib(pyrrole_path), read_cclib(pyrrolate_path))
+    data2 = create_data(read_cclib(pyrrole_path).to_series(),
+                        read_cclib(pyrrolate_path).to_series())
+
+    for col in (set(data1.columns) | set(data2.columns)) - {"atomcharges"}:
+        # WARNING: "atomcharges" is tricky to compare
+        for i in {pyrrole_path, pyrrolate_path}:
+            try:
+                assert_equal(data1.loc[i, col], data2.loc[i, col])
+            except ValueError:
+                try:
+                    assert_array_equal(data1.loc[i, col], data2.loc[i, col])
+                except AssertionError:
+                    try:
+                        assert_allclose(data1.loc[i, col], data2.loc[i, col])
+                    except TypeError:
+                        for j, k in zip(data1.loc[i, col], data2.loc[i, col]):
+                            assert_allclose(j, k)
+
+
+def test_can_create_data_from_dataframe():
+    """Test if we can create a data object from a DataFrame instance."""
+    pyrrole_path = 'data/pyrrole.out'
+    pyrrolate_path = 'data/pyrrolate.out'
+
+    data1 = create_data(read_cclib(pyrrole_path), read_cclib(pyrrolate_path))
+    data2 = create_data(data1)
+
+    for col in (set(data1.columns) | set(data2.columns)) - {"atomcharges"}:
+        # WARNING: "atomcharges" is tricky to compare
+        for i in {pyrrole_path, pyrrolate_path}:
+            try:
+                assert_equal(data1.loc[i, col], data2.loc[i, col])
+            except ValueError:
+                try:
+                    assert_array_equal(data1.loc[i, col], data2.loc[i, col])
+                except AssertionError:
+                    try:
+                        assert_allclose(data1.loc[i, col], data2.loc[i, col])
+                    except TypeError:
+                        for j, k in zip(data1.loc[i, col], data2.loc[i, col]):
+                            assert_allclose(j, k)
+
+
+def test_can_create_data_from_special_dataframes():
+    """Test if we can create a data object from special DataFrame instances."""
+    data = create_data(pd.DataFrame([]))
+    assert_equal(data.index.name, "name")
+
+    data = create_data(pd.DataFrame([{"jobfilename": "one.out",
+                                      "freeenergy": -1000.},
+                                     {"jobfilename": "two.out",
+                                      "freeenergy": -1001.}]))
+    assert_equal(data.index.name, "name")
+    assert(np.all(pd.isna(data.index)))
+
+    data1 = create_data(pd.DataFrame([{"jobfilename": "one.out",
+                                       "freeenergy": -1000.,
+                                       "name": "one"},
+                                      {"jobfilename": "two.out",
+                                       "freeenergy": -1001.}]))
+    assert_equal(data1.index.name, "name")
+
+    data2 = create_data(pd.DataFrame([{"jobfilename": "one.out",
+                                       "freeenergy": -1000.,
+                                       "name": "one"},
+                                      {"jobfilename": "two.out",
+                                       "freeenergy": -1001.}])
+                        .set_index("name"))
+    assert_equal(data2.index.name, "name")
+    assert_array_equal(data1, data2)
+
+    data3 = create_data(pd.DataFrame([{"jobfilename": "one.out",
+                                       "freeenergy": -1000.,
+                                       "name": "one",
+                                       "compound": "compound one"},
+                                      {"jobfilename": "two.out",
+                                       "freeenergy": -1001.}])
+                        .set_index("compound"))
+    assert_equal(data3.index.name, "name")
+    assert_array_equal(data2, data3)
+
+
+def test_create_data_without_names_indexed_filename():
+    """Test if data object created without names is indexed by filenames."""
+    pyrrole_path = 'data/pyrrole.out'
+    pyrrolate_path = 'data/pyrrolate.out'
+
+    data = create_data(read_cclib(pyrrole_path), read_cclib(pyrrolate_path))
+    assert(pyrrole_path in data.index)
+    assert(pyrrolate_path in data.index)
+
+
+def test_create_data_from_ccframe_database():
+    """Test can create data object from ccframe database."""
+    data = create_data(pd.read_hdf("data/data.h5"))
+    assert_array_equal(
+        data[["jobfilename", "freeenergy"]].values,
+        np.array([['data/acetate.out', -228.0004496],
+                  ['data/acetate@water.out', -228.12011268],
+                  ['data/acetic_acid.out', -228.56450866],
+                  ['data/acetic_acid@water.out', -228.57526805]],
+                 dtype=object))
+
+    assert_equal(sorted(data.columns),
+                 ['atomcharges', 'atomcoords', 'atommasses', 'atomnos',
+                  'charge', 'coreelectrons', 'enthalpy', 'entropy',
+                  'freeenergy', 'geotargets', 'geovalues', 'grads', 'homos',
+                  'jobfilename', 'metadata', 'moenergies', 'moments', 'mult',
+                  'natom', 'nbasis', 'nmo', 'optdone', 'pressure',
+                  'scfenergies', 'scftargets', 'scfvalues', 'temperature',
+                  'vibdisps', 'vibfreqs', 'vibirs'])
+
+
+def test_create_data_from_ccframe_database_with_merge():
+    """Test can create data object from ccframe database with merge."""
+    data = create_data(pd.read_hdf("data/acetate/data.h5"))
+    extra_data = pd.read_table("data/acetate/compounds.txt", sep="\s+")
+    data = (data.merge(extra_data, on="jobfilename", suffixes=("_x", ""))
+            .set_index("name"))
+
+    assert_array_equal(
+        data.reset_index()[
+            ["name", "jobfilename", "freeenergy", "random_column"]].values,
+        np.array([['acetate', 'data/acetate.out', -228.0004496, 'jubileu'],
+                  ['acetate@water', 'data/acetate@water.out', -228.12011268,
+                   'pica-pau'],
+                  ['acetic_acid', 'data/acetic_acid.out', -228.56450866,
+                   'rafael'],
+                  ['acetic_acid@water', 'data/acetic_acid@water.out',
+                   -228.57526805, "pantera cor de rosa"]],
+                 dtype=object))
+
+    assert_equal(sorted(data.columns),
+                 ['atomcharges', 'atomcoords', 'atommasses', 'atomnos',
+                  'charge', 'coreelectrons', 'enthalpy', 'entropy',
+                  'freeenergy', 'geotargets', 'geovalues', 'grads', 'homos',
+                  'jobfilename', 'metadata', 'moenergies', 'moments', 'mult',
+                  'natom', 'nbasis', 'nmo', 'optdone', 'pressure',
+                  'random_column', 'scfenergies', 'scftargets', 'scfvalues',
+                  'temperature', 'vibdisps', 'vibfreqs', 'vibirs'])
+
+
+def test_create_data_from_ccframe_database_with_merge_no_set_index():
+    """Test can create data object from ccframe database without set_index."""
+    data = create_data(pd.read_hdf("data/acetate/data.h5"))
+    extra_data = pd.read_table("data/acetate/compounds.txt", sep="\s+")
+    data = (data.merge(extra_data, on="jobfilename", suffixes=("_x", ""))
+            .set_index("name"))
+
+    assert_array_equal(
+        data.reset_index()[
+            ["name", "jobfilename", "freeenergy", "random_column"]].values,
+        np.array([['acetate', 'data/acetate.out', -228.0004496, 'jubileu'],
+                  ['acetate@water', 'data/acetate@water.out', -228.12011268,
+                   'pica-pau'],
+                  ['acetic_acid', 'data/acetic_acid.out', -228.56450866,
+                   'rafael'],
+                  ['acetic_acid@water', 'data/acetic_acid@water.out',
+                   -228.57526805, "pantera cor de rosa"]],
+                 dtype=object))
+
+    assert_equal(sorted(data.columns),
+                 ['atomcharges', 'atomcoords', 'atommasses', 'atomnos',
+                  'charge', 'coreelectrons', 'enthalpy', 'entropy',
+                  'freeenergy', 'geotargets', 'geovalues', 'grads', 'homos',
+                  'jobfilename', 'metadata', 'moenergies', 'moments', 'mult',
+                  'natom', 'nbasis', 'nmo', 'optdone', 'pressure',
+                  'random_column', 'scfenergies', 'scftargets', 'scfvalues',
+                  'temperature', 'vibdisps', 'vibfreqs', 'vibirs'])
 
 
 def test_can_fragment_molecule():

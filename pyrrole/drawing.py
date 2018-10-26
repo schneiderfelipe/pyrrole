@@ -109,9 +109,9 @@ def tower_layout(graph, height='freeenergy', scale=None, center=None, dim=2):
     >>> from pyrrole import ChemicalSystem
     >>> from pyrrole.atoms import create_data, read_cclib
     >>> from pyrrole.drawing import tower_layout
-    >>> data = create_data([
-    ...     read_cclib("data/acetic_acid.out", "AcOH(g)"),
-    ...     read_cclib("data/acetic_acid@water.out", "AcOH(aq)")])
+    >>> data = create_data(
+    ...     read_cclib("data/acetate/acetic_acid.out", "AcOH(g)"),
+    ...     read_cclib("data/acetate/acetic_acid@water.out", "AcOH(aq)"))
     >>> digraph = (ChemicalSystem("AcOH(g) <=> AcOH(aq)", data)
     ...            .to_digraph())
     >>> layout = tower_layout(digraph)

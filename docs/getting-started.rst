@@ -23,9 +23,9 @@ The `data` object consists of a `pandas.DataFrame` whose records represent chemi
 For our specific problem, we read logfiles (using the `read_cclib` function, which parses logfiles with the `cclib library <https://cclib.github.io/>`_) and store them in the required tabular form (using `create_data`):
 
 >>> from pyrrole.atoms import read_cclib, create_data
->>> aa_vacuum = read_cclib("data/acetic_acid.out", "AcOH(g)")
->>> aa_water = read_cclib("data/acetic_acid@water.out", "AcOH(aq)")
->>> data = create_data([aa_vacuum, aa_water])
+>>> aa_vacuum = read_cclib("data/acetate/acetic_acid.out", "AcOH(g)")
+>>> aa_water = read_cclib("data/acetate/acetic_acid@water.out", "AcOH(aq)")
+>>> data = create_data(aa_vacuum, aa_water)
 
 Each row of `data` above contains information found in a single logfile:
 

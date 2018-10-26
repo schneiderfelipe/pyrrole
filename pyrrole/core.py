@@ -383,9 +383,9 @@ class ChemicalEquation:
         --------
         >>> from pyrrole import ChemicalEquation
         >>> from pyrrole.atoms import create_data, read_cclib
-        >>> data = create_data([
-        ...     read_cclib("data/acetic_acid.out", "AcOH(g)"),
-        ...     read_cclib("data/acetic_acid@water.out", "AcOH(aq)")])
+        >>> data = create_data(
+        ...     read_cclib("data/acetate/acetic_acid.out", "AcOH(g)"),
+        ...     read_cclib("data/acetate/acetic_acid@water.out", "AcOH(aq)"))
         >>> equilibrium = ChemicalEquation("AcOH(g) <=> AcOH(aq)",
         ...                                data)
         >>> equilibrium.to_series()
@@ -618,9 +618,9 @@ class ChemicalSystem:
         --------
         >>> from pyrrole import ChemicalSystem
         >>> from pyrrole.atoms import create_data, read_cclib
-        >>> data = create_data([
-        ...     read_cclib("data/acetic_acid.out", "AcOH(g)"),
-        ...     read_cclib("data/acetic_acid@water.out", "AcOH(aq)")])
+        >>> data = create_data(
+        ...     read_cclib("data/acetate/acetic_acid.out", "AcOH(g)"),
+        ...     read_cclib("data/acetate/acetic_acid@water.out", "AcOH(aq)"))
         >>> data = data[["enthalpy", "freeenergy"]]
         >>> equilibrium = ChemicalSystem("AcOH(g) <=> AcOH(aq)", data)
         >>> equilibrium.to_dataframe()  # doctest: +NORMALIZE_WHITESPACE
@@ -651,9 +651,9 @@ class ChemicalSystem:
         --------
         >>> from pyrrole import ChemicalSystem
         >>> from pyrrole.atoms import create_data, read_cclib
-        >>> data = create_data([
-        ...     read_cclib("data/acetic_acid.out", "AcOH(g)"),
-        ...     read_cclib("data/acetic_acid@water.out", "AcOH(aq)")])
+        >>> data = create_data(
+        ...     read_cclib("data/acetate/acetic_acid.out", "AcOH(g)"),
+        ...     read_cclib("data/acetate/acetic_acid@water.out", "AcOH(aq)"))
         >>> equilibrium = ChemicalSystem("AcOH(g) <=> AcOH(aq)", data)
         >>> digraph = equilibrium.to_digraph()
         >>> sorted(digraph.nodes(data='freeenergy'))

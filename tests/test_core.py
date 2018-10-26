@@ -81,8 +81,9 @@ def test_can_parse_printed_chemical_equation():
 
 def test_can_convert_chemical_equation_to_series():
     """Test if we can convert chemical equation to series."""
-    data = create_data([read_cclib("data/acetic_acid.out", "AcOH(g)"),
-                        read_cclib("data/acetic_acid@water.out", "AcOH(aq)")])
+    data = create_data(read_cclib("data/acetate/acetic_acid.out", "AcOH(g)"),
+                       read_cclib("data/acetate/acetic_acid@water.out",
+                                  "AcOH(aq)"))
     equilibrium = ChemicalEquation("AcOH(g) <=> AcOH(aq)", data)
     series = equilibrium.to_series()
     assert_equal(series['natom'], 0.)
@@ -99,8 +100,9 @@ def test_can_convert_chemical_equation_to_series():
 
 def test_is_chemical_equation_to_series_consistent():
     """Test if conversion of chemical equation to series is consistent."""
-    data = create_data([read_cclib("data/acetic_acid.out", "AcOH(g)"),
-                        read_cclib("data/acetic_acid@water.out", "AcOH(aq)")])
+    data = create_data(read_cclib("data/acetate/acetic_acid.out", "AcOH(g)"),
+                       read_cclib("data/acetate/acetic_acid@water.out",
+                                  "AcOH(aq)"))
     equilibrium = ChemicalEquation("AcOH(g) <=> AcOH(aq)", data)
     assert_allclose(equilibrium.to_series(),
                     equilibrium.to_series("products")
@@ -120,8 +122,9 @@ def test_can_obtain_species_from_chemical_equation():
 
 def test_can_convert_chemical_system_to_dataframe():
     """Test if we can convert chemical system to dataframe."""
-    data = create_data([read_cclib("data/acetic_acid.out", "AcOH(g)"),
-                        read_cclib("data/acetic_acid@water.out", "AcOH(aq)")])
+    data = create_data(read_cclib("data/acetate/acetic_acid.out", "AcOH(g)"),
+                       read_cclib("data/acetate/acetic_acid@water.out",
+                                  "AcOH(aq)"))
     equilibrium = ChemicalSystem("AcOH(g) <=> AcOH(aq)", data)
     dataframe = equilibrium.to_dataframe()
     assert(np.all(dataframe['natom'] == 0.))

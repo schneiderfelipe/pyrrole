@@ -15,8 +15,9 @@ from pyrrole.drawing import diagram_layout, tower_layout
 
 def test_can_produce_tower_layout():
     """Test if we can produce a tower layout."""
-    data = create_data([read_cclib("data/acetic_acid.out", "AcOH(g)"),
-                        read_cclib("data/acetic_acid@water.out", "AcOH(aq)")])
+    data = create_data(read_cclib("data/acetate/acetic_acid.out", "AcOH(g)"),
+                       read_cclib("data/acetate/acetic_acid@water.out",
+                                  "AcOH(aq)"))
     digraph = (ChemicalSystem("AcOH(g) <=> AcOH(aq)", data).to_digraph())
 
     layout = tower_layout(digraph)
@@ -30,8 +31,9 @@ def test_can_produce_tower_layout():
 
 def test_can_produce_tower_layout_with_scale():
     """Test if we can produce a tower layout with scale."""
-    data = create_data([read_cclib("data/acetic_acid.out", "AcOH(g)"),
-                        read_cclib("data/acetic_acid@water.out", "AcOH(aq)")])
+    data = create_data(read_cclib("data/acetate/acetic_acid.out", "AcOH(g)"),
+                       read_cclib("data/acetate/acetic_acid@water.out",
+                                  "AcOH(aq)"))
     digraph = (ChemicalSystem("AcOH(g) <=> AcOH(aq)", data).to_digraph())
 
     layout = tower_layout(digraph, scale=1)
