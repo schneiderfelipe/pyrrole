@@ -364,7 +364,8 @@ class ChemicalEquation:
         return '{} {} {}'.format(' + '.join(reactants), self.arrow,
                                  ' + '.join(products))
 
-    def to_series(self, only=None):
+    def to_series(self, only=None,
+                  intensive_columns=["temperature", "pressure"]):
         """
         Produce a data record for `ChemicalEquation`.
 
@@ -380,6 +381,10 @@ class ChemicalEquation:
             Instead of the standard behaviour (difference of sums), sum numeric
             attributes of either reactants or products only. If given, absolute
             coefficients are used.
+        intensive_columns : iterable of `str`, optional
+            A set of column names representing intensive properties (e.g. bulk
+            properties) whose values are not summable. Those must be constant
+            throughout the chemical equation.
 
         Returns
         -------
@@ -394,7 +399,7 @@ class ChemicalEquation:
         ValueError
             Raised if `self.data` wasn't defined (e.g. is `None`), if `only`
             is something other than ``"reactants"`` or ``"products"``, or if
-            two or more different values for an intrinsic property have been
+            two or more distinct values for an intensive property have been
             found.
 
         Examples
@@ -402,21 +407,23 @@ class ChemicalEquation:
         >>> from pyrrole import ChemicalEquation
         >>> from pyrrole.atoms import create_data, read_cclib
         >>> data = create_data(
-        ...     read_cclib("data/acetate/acetic_acid.out", "AcOH(g)"),
-        ...     read_cclib("data/acetate/acetic_acid@water.out", "AcOH(aq)"))
+        ...     read_cclib("data/acetate/acetic_acid.out",
+        ...                "AcOH(g)"),
+        ...     read_cclib("data/acetate/acetic_acid@water.out",
+        ...                "AcOH(aq)"))
         >>> equilibrium = ChemicalEquation("AcOH(g) <=> AcOH(aq)",
         ...                                data)
         >>> equilibrium.to_series()
-        charge         0.000000
-        enthalpy      -0.010958
-        entropy       -0.000198
-        freeenergy    -0.010759
-        mult           0.000000
-        natom          0.000000
-        nbasis         0.000000
-        nmo            0.000000
-        pressure       0.000000
-        temperature    0.000000
+        charge           0.000000
+        enthalpy        -0.010958
+        entropy         -0.000198
+        freeenergy      -0.010759
+        mult             0.000000
+        natom            0.000000
+        nbasis           0.000000
+        nmo              0.000000
+        pressure         1.000000
+        temperature    298.150000
         Name: AcOH(g) <=> AcOH(aq), dtype: float64
 
         Sums of either reactants or products can be computed:
@@ -441,6 +448,11 @@ class ChemicalEquation:
 
         # TODO: find a way to keep categorical columns. Keep if they match?
         columns = self.data.select_dtypes('number').columns
+        intensive_columns = [column for column in columns
+                             if column in intensive_columns]
+        extensive_columns = [column for column in columns
+                             if column not in intensive_columns]
+        columns = extensive_columns + intensive_columns
 
         if only is None:
             species = self.species
@@ -453,11 +465,14 @@ class ChemicalEquation:
                              "('{}' given)".format(only))
 
         if all([s in self.data.index for s in species]):
-            # TODO: if two rows in self.data have the same indices, this must
-            # sort them somehow (custom compare function?) and get the first
-            # row
-            series = (self.data.loc[species, columns]
+            series = (self.data.loc[species, extensive_columns]
                       .mul(self.coefficient, axis="index").sum("index"))
+            for column in intensive_columns:
+                vals = self.data[column].unique()
+                if len(vals) > 1:
+                    raise ValueError("different values for {}: "
+                                     "{}".format(column, vals))
+                series[column] = vals[0]
         else:
             series = _pd.Series(_np.nan, index=columns)
 
@@ -467,7 +482,7 @@ class ChemicalEquation:
             coefficients = self.coefficient[species]
             name = _get_chemical_equation_piece(species, coefficients)
             if only == "reactants":
-                series = -series
+                series[extensive_columns] = -series[extensive_columns]
 
         # Avoid negative zero
         # (see https://stackoverflow.com/a/11010791/4039050)
@@ -615,7 +630,7 @@ class ChemicalSystem:
             ", ".join(['"' + str(equation) + '"'
                        for equation in self.equations]))
 
-    def to_dataframe(self):
+    def to_dataframe(self, *args, **kwargs):
         """
         Produce a data table with records for all chemical equations.
 
@@ -632,22 +647,29 @@ class ChemicalSystem:
             Data table with records of attribute differences for every single
             `ChemicalEquation` object in the model.
 
+        Notes
+        -----
+        Further arguments and keywords are passed directly to
+        `ChemicalEquation.to_series`.
+
         Examples
         --------
         >>> from pyrrole import ChemicalSystem
         >>> from pyrrole.atoms import create_data, read_cclib
         >>> data = create_data(
-        ...     read_cclib("data/acetate/acetic_acid.out", "AcOH(g)"),
-        ...     read_cclib("data/acetate/acetic_acid@water.out", "AcOH(aq)"))
-        >>> data = data[["enthalpy", "freeenergy"]]
+        ...     read_cclib("data/acetate/acetic_acid.out",
+        ...                "AcOH(g)"),
+        ...     read_cclib("data/acetate/acetic_acid@water.out",
+        ...                "AcOH(aq)"))
+        >>> data = data[["enthalpy", "entropy", "freeenergy"]]
         >>> equilibrium = ChemicalSystem("AcOH(g) <=> AcOH(aq)", data)
         >>> equilibrium.to_dataframe()  # doctest: +NORMALIZE_WHITESPACE
-                              enthalpy  freeenergy
+                              enthalpy   entropy  freeenergy
         chemical_equation
-        AcOH(g) <=> AcOH(aq) -0.010958   -0.010759
+        AcOH(g) <=> AcOH(aq) -0.010958 -0.000198   -0.010759
 
         """
-        dataframe = _pd.DataFrame([equation.to_series()
+        dataframe = _pd.DataFrame([equation.to_series(*args, **kwargs)
                                    for equation in self.equations])
         dataframe.index.name = "chemical_equation"
         return dataframe

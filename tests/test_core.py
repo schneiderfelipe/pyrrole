@@ -89,8 +89,8 @@ def test_can_convert_chemical_equation_to_series():
     assert_equal(series['natom'], 0.)
     assert_equal(series['charge'], 0.)
     assert_equal(series['mult'], 0.)
-    assert_equal(series['temperature'], 0.)
-    assert_equal(series['pressure'], 0.)
+    assert_equal(series['temperature'], 298.15)
+    assert_equal(series['pressure'], 1.)
     assert_equal(series['nmo'], 0.)
     assert_equal(series['nbasis'], 0.)
     assert_allclose(series['enthalpy'], -0.01095788)
@@ -104,7 +104,7 @@ def test_is_chemical_equation_to_series_consistent():
                        read_cclib("data/acetate/acetic_acid@water.out",
                                   "AcOH(aq)"))
     equilibrium = ChemicalEquation("AcOH(g) <=> AcOH(aq)", data)
-    assert_allclose(equilibrium.to_series(),
+    assert_allclose(equilibrium.to_series(intensive_columns=[]),
                     equilibrium.to_series("products")
                     - equilibrium.to_series("reactants"))
 
@@ -130,8 +130,8 @@ def test_can_convert_chemical_system_to_dataframe():
     assert(np.all(dataframe['natom'] == 0.))
     assert(np.all(dataframe['charge'] == 0.))
     assert(np.all(dataframe['mult'] == 0.))
-    assert(np.all(dataframe['temperature'] == 0.))
-    assert(np.all(dataframe['pressure'] == 0.))
+    assert(np.all(dataframe['temperature'] == 298.15))
+    assert(np.all(dataframe['pressure'] == 1.))
     assert(np.all(dataframe['nmo'] == 0.))
     assert(np.all(dataframe['nbasis'] == 0.))
     assert_allclose(dataframe['enthalpy'], -0.01095788)
