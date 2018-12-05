@@ -13,6 +13,7 @@ except ImportError:
     from collections import Iterable as _Iterable
     from collections import Mapping as _Mapping
     from collections import Sequence as _Sequence
+import warnings as _warnings
 
 import numpy as _np
 import pandas as _pd
@@ -110,6 +111,49 @@ def _get_chemical_equation_piece(species_list, coefficients):
     return '{}'.format(' + '.join(bag))
 
 
+def _check_data(data):
+    """
+    Check a data object for inconsistencies.
+
+    Parameters
+    ----------
+    data : `pandas.DataFrame`
+        A `data` object, i.e., a table whose rows store information about
+        chemical species, indexed by chemical species.
+
+    Warns
+    -----
+    UserWarning
+        Warned if a ground state species has one or more imaginary vibrational
+        frequencies, or if a transition state species has zero, two or more
+        imaginary vibrational frequencies.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from pyrrole.core import _check_data
+    >>> data = (pd.DataFrame([{'name': 'A', 'vibfreqs': [0., 1., 2.]},
+    ...                       {'name': 'B', 'vibfreqs': [0., -1., 2.]},
+    ...                       {'name': 'C', 'vibfreqs': [0., -1., -2.]},
+    ...                       {'name': 'A#', 'vibfreqs': [0., 1., 2.]},
+    ...                       {'name': 'C#', 'vibfreqs': [0., -2., -1.]},
+    ...                       {'name': 'B#', 'vibfreqs': [0., -1., 2.]}])
+    ...         .set_index('name'))
+    >>> _check_data(data)
+
+    """
+    if "vibfreqs" in data.columns:
+        for species in data.index:
+            vibfreqs = data.loc[species, "vibfreqs"]
+            nimagvibfreqs = _np.sum(_np.array(vibfreqs) < 0)
+            if species[-1] == '#' and nimagvibfreqs != 1:
+                _warnings.warn("'{}' should have 1 imaginary vibfreqs but {} "
+                               "found".format(species, nimagvibfreqs))
+            elif species[-1] != '#' and nimagvibfreqs != 0:
+                _warnings.warn("'{}' should have no imaginary vibfreqs but {} "
+                               "found".format(species, nimagvibfreqs))
+
+
 class ChemicalEquation:
     """
     An object for manipulating chemical equations in a way similar to vectors.
@@ -133,6 +177,8 @@ class ChemicalEquation:
     arrow : `str`, optional
         Arrow symbol to use if `value` is a mapping or `Series`,
         ignored otherwise.
+    check_data : `bool`, optional
+        Whether to check data object for inconsistencies.
 
     Attributes
     ----------
@@ -240,7 +286,7 @@ class ChemicalEquation:
 
     """
 
-    def __init__(self, value, data=None, arrow=None):
+    def __init__(self, value, data=None, arrow=None, check_data=True):
         """See the docstring for this class."""
         # TODO: make tests for usage of data.
         if isinstance(value, ChemicalEquation):
@@ -276,8 +322,11 @@ class ChemicalEquation:
 
         self.coefficient = self.coefficient.rename(self.__str__())
         self.data = data
-        if self.data is not None and not isinstance(self.data, _pd.DataFrame):
-            self.data = _pd.DataFrame(self.data)
+        if self.data is not None:
+            if not isinstance(self.data, _pd.DataFrame):
+                self.data = _pd.DataFrame(self.data)
+            if check_data:
+                _check_data(self.data.loc[self.species])
 
     def _get_products(self):
         return self.coefficient[self.coefficient > 0].index
@@ -365,7 +414,8 @@ class ChemicalEquation:
                                  ' + '.join(products))
 
     def to_series(self, only=None,
-                  intensive_columns=["temperature", "pressure"]):
+                  intensive_columns=["temperature", "pressure"],
+                  check_data=True):
         """
         Produce a data record for `ChemicalEquation`.
 
@@ -385,6 +435,8 @@ class ChemicalEquation:
             A set of column names representing intensive properties (e.g. bulk
             properties) whose values are not summable. Those must be constant
             throughout the chemical equation.
+        check_data : `bool`, optional
+            Whether to check data object for inconsistencies.
 
         Returns
         -------
@@ -463,6 +515,9 @@ class ChemicalEquation:
         else:
             raise ValueError("only must be either 'reactants' or 'products' "
                              "('{}' given)".format(only))
+
+        if check_data:
+            _check_data(self.data.loc[species])
 
         if all([s in self.data.index for s in species]):
             series = (self.data.loc[species, extensive_columns]
@@ -574,6 +629,8 @@ class ChemicalSystem:
     data : `pandas.DataFrame`, optional
         A `data` object, i.e., a table whose rows store information about
         chemical species, indexed by chemical species.
+    check_data : `bool`, optional
+        Whether to check data object for inconsistencies.
 
     Attributes
     ----------
@@ -600,7 +657,7 @@ class ChemicalSystem:
 
     """
 
-    def __init__(self, values, data=None):
+    def __init__(self, values, data=None, check_data=True):
         """See the docstring for this class."""
         if isinstance(values, str):
             self.equations = list(map(ChemicalEquation,
@@ -617,8 +674,12 @@ class ChemicalSystem:
             self.equations = [ChemicalEquation(values)]
 
         self.data = data
-        if self.data is not None and not isinstance(self.data, _pd.DataFrame):
-            self.data = _pd.DataFrame(self.data)
+        if self.data is not None:
+            if not isinstance(self.data, _pd.DataFrame):
+                self.data = _pd.DataFrame(self.data)
+            if check_data:
+                _check_data(self.data)
+
         for equation in self.equations:
             # TODO: make a test for this if.
             if equation.data is None:
@@ -674,7 +735,7 @@ class ChemicalSystem:
         dataframe.index.name = "chemical_equation"
         return dataframe
 
-    def to_digraph(self):
+    def to_digraph(self, *args, **kwargs):
         """
         Compute a directed graph for the chemical system.
 
@@ -686,6 +747,11 @@ class ChemicalSystem:
             are used to represent equilibria. Attributes are computed with
             `ChemicalEquation.to_series` for each equation (see examples
             below).
+
+        Notes
+        -----
+        Further arguments and keywords are passed directly to
+        `ChemicalEquation.to_series`.
 
         Examples
         --------
@@ -711,19 +777,21 @@ class ChemicalSystem:
                                           in _split_arrows(str(equation))]
 
             try:
-                attr = equation.to_series("reactants").to_dict()
+                attr = equation.to_series("reactants", *args,
+                                          **kwargs).to_dict()
             except ValueError:
                 attr = dict()
             digraph.add_node(reactants, **attr)
 
             try:
-                attr = equation.to_series("products").to_dict()
+                attr = equation.to_series("products", *args,
+                                          **kwargs).to_dict()
             except ValueError:
                 attr = dict()
             digraph.add_node(products, **attr)
 
             try:
-                attr = equation.to_series().to_dict()
+                attr = equation.to_series(*args, **kwargs).to_dict()
             except ValueError:
                 attr = dict()
             digraph.add_edge(reactants, products, **attr)
