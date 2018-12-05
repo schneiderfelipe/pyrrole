@@ -153,6 +153,16 @@ class ChemicalEquation:
     species : iterable of `str`
         All species, i.e., union of all `reactants` and `products`.
 
+    Raises
+    ------
+    ValueError
+        Raised if `arrow` is given or calculated to be something other than
+        ``"->"`` or ``"<=>"`` (``"<-"`` is equivalent to ``"->"`` if
+        chemical equation is given as `str`).
+    TypeError
+        Raised if `value` is something other than `str`, mapping or
+        `pandas.Series`.
+
     Notes
     -----
     Chemical equations in pyrrole are defined according to the following
@@ -378,6 +388,14 @@ class ChemicalEquation:
             string representation of the `ChemicalEquation` or, if `only` is
             given, a string representing either reactants or products (see
             examples below).
+
+        Raises
+        ------
+        ValueError
+            Raised if `self.data` wasn't defined (e.g. is `None`), if `only`
+            is something other than ``"reactants"`` or ``"products"``, or if
+            two or more different values for an intrinsic property have been
+            found.
 
         Examples
         --------

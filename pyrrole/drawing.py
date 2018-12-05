@@ -308,6 +308,11 @@ def draw_diagram_nodes(graph, pos=None, nodelist=None, node_size=.7,
     `matplotlib.collections.LineCollection`
         `LineCollection` of the nodes.
 
+    Raises
+    ------
+    networkx.NetworkXError
+        Raised if a node has no position or one with bad value.
+
     Examples
     --------
     >>> import pandas as pd
@@ -418,6 +423,14 @@ def draw_diagram_edges(graph, pos=None, edgelist=None, width=1.0,
     -------
     `matplotlib.collections.LineCollection`
         `LineCollection` of the edges.
+
+    Raises
+    ------
+    networkx.NetworkXError
+        Raised if a node has no position or one with bad value.
+    ValueError
+        Raised if `edge_color` contains something other than color names (one
+        or a list of one per edge) or numbers.
 
     Examples
     --------

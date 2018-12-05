@@ -325,6 +325,13 @@ class Atoms:
             String representation of molecule in the specified format and/or
             dialect.
 
+        Raises
+        ------
+        KeyError
+            Raised if `dialect` value is currently not supported or if
+            `fragment_id` is given with a currently not supported `dialect`
+            value.
+
         Notes
         -----
         Format dialects are subformats that support extended functionality.
@@ -441,9 +448,11 @@ class Atoms:
                                                     fragment_id, 1)
                                        for line in body.split("\n")])
                     else:
-                        raise KeyError
+                        raise KeyError("fragment_id currently not supported "
+                                       "with dialect '{}'".format(dialect))
             else:
-                raise KeyError
+                raise KeyError("dialect '{}' currently not "
+                               "supported".format(dialect))
 
             if with_header:
                 s = "\n".join([natom, comment, body])
