@@ -82,7 +82,7 @@ AcOH(g) <=> AcOH(aq) -28.76991 -0.521109  -28.248775
 
 Now we're ready to start `using-data-sets`.
 
-.. [#level-of-theory] Calculations were done at `PBEh-3c`_/`SMD`_ (water) using the `ORCA`_ electronic structure package (version 4.0.1.2). Logfiles can be found in the `project's repository <https://github.com/dudektria/pyrrole>`_.
+.. [#level-of-theory] Calculations were done at `PBEh-3c`_/`SMD`_ (water) using the `ORCA`_ electronic structure package (version 4.0.1.2). Logfiles can be found in the `project's repository <https://github.com/dudektria/pyrrole/tree/master/data>`_.
 
 .. _`PBEh-3c`: https://doi.org/10.1063/1.4927476
 .. _`SMD`: https://doi.org/10.1021/jp810292n
