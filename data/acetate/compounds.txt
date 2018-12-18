@@ -1,0 +1,5 @@
+name     jobfilename                         comment
+AcOH(g)  data/acetate/acetic_acid.out        "acetic acid in gas phase"
+AcO-(g)  data/acetate/acetate.out            "acetate in gas phase"
+AcOH(aq) data/acetate/acetic_acid@water.out  "acetic acid in water"
+AcO-(aq) data/acetate/acetate@water.out      "acetate in water"

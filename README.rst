@@ -41,7 +41,7 @@ Below we read computational chemistry logfiles of both ground and transition sta
 >>> data = create_data(gs, ts)
 
 Pyrrole uses `cclib <https://cclib.github.io/>`_ for reading logfiles, which is `compatible with all major computational chemistry packages <https://cclib.github.io/#summary>`_.
-You could also want to read tabular data :ref:`from a file <Reading local files>` (or even :ref:`from the web <Reading the web>`) using `pandas <https://pandas.pydata.org/>`_.
+You could also want to read tabular data `from a file <https://pyrrole.readthedocs.io/en/latest/using-data-sets.html#reading-local-files>`_ (or even `from the web <https://pyrrole.readthedocs.io/en/latest/using-data-sets.html#reading-the-web>`_) using `pandas <https://pandas.pydata.org/>`_.
 
 2. **Specify the model**
 
@@ -64,7 +64,7 @@ Simply let pyrrole calculate the energy barrier:
 
 (As a side note, the reference value is 21.162 kJ/mol [#experimental-freeenergy-ammonia-inversion]_.)
 
-Interested? `Have another example <getting-started>`.
+Interested? `Have another example <https://pyrrole.readthedocs.io/en/latest/getting-started.html>`_.
 
 .. [#level-of-theory] Optimizations and frequency calculations of both ammonia and the planar transition state were performed at `PBEh-3c`_ using the `ORCA`_ electronic structure package (version 4.0.1.2). Logfiles can be found in the `project's repository <https://github.com/dudektria/pyrrole/tree/master/data>`_.
 
@@ -81,7 +81,3 @@ You can get the library directly from `PyPI <https://pypi.org/project/pyrrole/>`
 .. code-block:: console
 
    $ pip install pyrrole
-
-.. image:: data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIj8+CjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0idG9wc3ZnIgp4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIgp4bWxuczpjbWw9Imh0dHA6Ly93d3cueG1sLWNtbC5vcmcvc2NoZW1hIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjAwcHgiIGhlaWdodD0iMjAwcHgiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KPHRpdGxlPnB5cnJvbGUgLSBPcGVuIEJhYmVsIERlcGljdGlvbjwvdGl0bGU+CjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSJ3aGl0ZSIvPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLDApIj4KPHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeD0iMCIgeT0iMCIgdmlld0JveD0iMCAwIDE0NC43MjEgMTQxLjU1NCIKZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHN0cm9rZT0icmdiKDAsMCwwKSIgc3Ryb2tlLXdpZHRoPSIyIiAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj4KPGxpbmUgeDE9IjkyLjQiIHkxPSIxMDEuNiIgeDI9IjEwNC43IiB5Mj0iNjMuNSIgc3Ryb2tlPSJyZ2IoMCwwLDApIiAgc3Ryb2tlLXdpZHRoPSIyLjAiLz4KPGxpbmUgeDE9Ijg3LjQiIHkxPSI5My42IiB4Mj0iOTYuMCIgeTI9IjY3LjAiIHN0cm9rZT0icmdiKDAsMCwwKSIgIHN0cm9rZS13aWR0aD0iMi4wIi8+CjxsaW5lIHgxPSIxMDQuNyIgeTE9IjYzLjUiIHgyPSI4Mi45IiB5Mj0iNDcuNiIgc3Ryb2tlPSJyZ2IoMCwwLDApIiAgc3Ryb2tlLXdpZHRoPSIyLjAiLz4KPGxpbmUgeDE9IjYxLjgiIHkxPSI0Ny42IiB4Mj0iNDAuMCIgeTI9IjYzLjUiIHN0cm9rZT0icmdiKDAsMCwwKSIgIHN0cm9rZS13aWR0aD0iMi4wIi8+CjxsaW5lIHgxPSI0MC4wIiB5MT0iNjMuNSIgeDI9IjUyLjQiIHkyPSIxMDEuNiIgc3Ryb2tlPSJyZ2IoMCwwLDApIiAgc3Ryb2tlLXdpZHRoPSIyLjAiLz4KPGxpbmUgeDE9IjQ4LjciIHkxPSI2Ny4wIiB4Mj0iNTcuNCIgeTI9IjkzLjYiIHN0cm9rZT0icmdiKDAsMCwwKSIgIHN0cm9rZS13aWR0aD0iMi4wIi8+CjxsaW5lIHgxPSI1Mi40IiB5MT0iMTAxLjYiIHgyPSI5Mi40IiB5Mj0iMTAxLjYiIHN0cm9rZT0icmdiKDAsMCwwKSIgIHN0cm9rZS13aWR0aD0iMi4wIi8+Cjx0ZXh0IHg9IjY2LjM2MDY4MCIgeT0iNDguMDAwMDAwIiBmaWxsPSJyZ2IoMTIsMTIsMjU1KSIgIHN0cm9rZT0icmdiKDEyLDEyLDI1NSkiIHN0cm9rZS13aWR0aD0iMSIgZm9udC1zaXplPSIxNiIgPk48L3RleHQ+Cjx0ZXh0IHg9IjY2LjM2MDY4MCIgeT0iMzIuMDAwMDAwIiBmaWxsPSJyZ2IoMTIsMTIsMjU1KSIgIHN0cm9rZT0icmdiKDEyLDEyLDI1NSkiIHN0cm9rZS13aWR0aD0iMSIgZm9udC1zaXplPSIxNiIgPkg8L3RleHQ+Cjwvc3ZnPgo8Y21sOm1vbGVjdWxlIGlkPSJweXJyb2xlIj4KIDxjbWw6YXRvbUFycmF5PgogIDxjbWw6YXRvbSBpZD0iYTEiIGVsZW1lbnRUeXBlPSJDIiB4Mj0iMC44MDkwMTciIHkyPSItMC41ODc3ODUiLz4KICA8Y21sOmF0b20gaWQ9ImEyIiBlbGVtZW50VHlwZT0iQyIgeDI9IjAuNTAwMDAwIiB5Mj0iLTEuNTM4ODQyIi8+CiAgPGNtbDphdG9tIGlkPSJhMyIgZWxlbWVudFR5cGU9IkMiIHgyPSItMC41MDAwMDAiIHkyPSItMS41Mzg4NDIiLz4KICA8Y21sOmF0b20gaWQ9ImE0IiBlbGVtZW50VHlwZT0iQyIgeDI9Ii0wLjgwOTAxNyIgeTI9Ii0wLjU4Nzc4NSIvPgogIDxjbWw6YXRvbSBpZD0iYTUiIGVsZW1lbnRUeXBlPSJOIiB4Mj0iMC4wMDAwMDAiIHkyPSItMC4wMDAwMDAiLz4KIDwvY21sOmF0b21BcnJheT4KIDxjbWw6Ym9uZEFycmF5PgogIDxjbWw6Ym9uZCBhdG9tUmVmczI9ImEyIGEzIiBvcmRlcj0iMSIvPgogIDxjbWw6Ym9uZCBhdG9tUmVmczI9ImEyIGExIiBvcmRlcj0iMiIvPgogIDxjbWw6Ym9uZCBhdG9tUmVmczI9ImEzIGE0IiBvcmRlcj0iMiIvPgogIDxjbWw6Ym9uZCBhdG9tUmVmczI9ImExIGE1IiBvcmRlcj0iMSIvPgogIDxjbWw6Ym9uZCBhdG9tUmVmczI9ImE0IGE1IiBvcmRlcj0iMSIvPgogPC9jbWw6Ym9uZEFycmF5Pgo8L2NtbDptb2xlY3VsZT4KPC9nPgo8L3N2Zz4K
-  :alt: pyrrole
-  :align: center

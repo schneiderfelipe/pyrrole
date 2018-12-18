@@ -1,0 +1,2 @@
+AcO-(g) <=> AcO-(aq)
+AcOH(g) <=> AcOH(aq)

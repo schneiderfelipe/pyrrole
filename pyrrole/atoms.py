@@ -86,7 +86,7 @@ class Atoms:
     `xyz format <https://en.wikipedia.org/wiki/XYZ_file_format>`_:
 
     >>> from pyrrole.atoms import read_pybel
-    >>> print(read_pybel("data/pyrrole.xyz", "pyrrole"))
+    >>> print(read_pybel("data/pyrrolate/pyrrole.xyz", "pyrrole"))
     C         -1.11468        0.00000        0.33059
     C         -0.70848        0.00000       -0.97739
     C          0.70848        0.00000       -0.97739
@@ -515,7 +515,7 @@ def read_cclib(value, name=None):
     Examples
     --------
     >>> from pyrrole.atoms import read_cclib
-    >>> molecule = read_cclib('data/pyrrole.out')
+    >>> molecule = read_cclib('data/pyrrolate/pyrrole.out')
     >>> molecule.atomnos
     array([6, 6, 6, 6, 7, 1, 1, 1, 1, 1], dtype=int32)
     >>> molecule.charge
@@ -585,7 +585,7 @@ def read_pybel(value, name=None):
     Examples
     --------
     >>> from pyrrole.atoms import read_pybel
-    >>> molecule = read_pybel('data/pyrrole.xyz')
+    >>> molecule = read_pybel('data/pyrrolate/pyrrole.xyz')
     >>> molecule.atomnos
     array([6, 6, 6, 6, 7, 1, 1, 1, 1, 1], dtype=int32)
     >>> molecule.natom

@@ -30,7 +30,7 @@ def test_can_make_atoms_from_dict():
 
 
 def test_can_make_atoms_from_series():
-    """Test if we can make Atoms from Series."""
+    """Test if we can make Atoms from pandas.Series."""
     atomcoords = [[0.0, 0.0, 0.0], [0.0, 0.0, 1.128]]
     atomnos = [6, 8]
     charge = 0
@@ -49,7 +49,7 @@ def test_can_make_atoms_from_series():
 
 def test_can_make_atoms_with_read_cclib_and_ccopen():
     """Test if we can make Atoms with read_cclib and ccopen."""
-    path = 'data/pyrrole.out'
+    path = 'data/pyrrolate/pyrrole.out'
     logfile = ccopen(path)
 
     mol = read_cclib(logfile.parse())
@@ -74,13 +74,12 @@ def test_can_make_atoms_with_read_cclib_and_ccopen():
     assert_equal(mol.mult, 1)
     assert_equal(mol.natom, 10)
 
-    # TODO: is this is the pure scf energy (no corrections added)?
     assert_equal(mol.scfenergies[-1], -5706.623393767155)
 
 
 def test_can_access_attributes():
     """Test if we can access data as attributes."""
-    path = 'data/pyrrole.out'
+    path = 'data/pyrrolate/pyrrole.out'
     mol = read_cclib(path)
 
     for key, value in mol.attributes.items():
@@ -92,7 +91,7 @@ def test_can_access_attributes():
 
 def test_can_get_logfile_path():
     """Test if logfile path is obtainable."""
-    path = 'data/pyrrole.out'
+    path = 'data/pyrrolate/pyrrole.out'
     mol = read_cclib(path)
 
     assert_equal(mol.jobfilename, path)
@@ -100,7 +99,7 @@ def test_can_get_logfile_path():
 
 def test_does_read_cclib_call_parse():
     """Test if read_cclib calls parse on object if necessary."""
-    path = 'data/pyrrole.out'
+    path = 'data/pyrrolate/pyrrole.out'
     logfile = ccopen(path)
 
     mol1 = read_cclib(logfile)
@@ -115,7 +114,7 @@ def test_does_read_cclib_call_parse():
 
 def test_can_make_atoms_with_read_cclib_and_path():
     """Test if we can make Atoms with read_cclib and path to logfile."""
-    path = 'data/pyrrole.out'
+    path = 'data/pyrrolate/pyrrole.out'
     logfile = ccopen(path)
 
     mol1 = read_cclib(path)
@@ -144,7 +143,7 @@ O          0.00000        0.00000        1.12800""")
 
 def test_can_print_atoms_with_scfenergy():
     """Test if we can print Atom instances with scfenergy."""
-    path = 'data/pyrrole.out'
+    path = 'data/pyrrolate/pyrrole.out'
     mol = read_cclib(path)
     scfenergy = mol.scfenergies[-1]
     natom = mol.natom
@@ -229,7 +228,7 @@ H   1.72977 1 -0.08038 1  0.53387 1""")
 
 
 def test_can_convert_atoms_to_series():
-    """Test if we can convert Atom instances to series."""
+    """Test if we can convert Atom instances to pandas.Series."""
     atomcoords = [[0., 0., 0.], [0., 0., 1.21]]
     atomnos = [8, 8]
     charge = 0
@@ -255,18 +254,17 @@ def test_can_convert_atoms_to_series():
 def test_can_create_data_from_atoms():
     """Test if we can create a data object from Atom instances."""
     pyrrole_name = 'pyrrole'
-    pyrrole_path = 'data/pyrrole.out'
-    pyrrole_mol = read_cclib(pyrrole_path, pyrrole_name)
+    pyrrole_path = 'data/pyrrolate/pyrrole.out'
+    pyrrole = read_cclib(pyrrole_path, pyrrole_name)
 
-    pyrrolate_path = 'data/pyrrolate.out'
-    pyrrolate_mol = read_cclib(pyrrolate_path)
-
+    pyrrolate_path = 'data/pyrrolate/pyrrolate.out'
+    pyrrolate = read_cclib(pyrrolate_path)
 
     dioxygen_name = 'dioxygen'
     dioxygen_atomcoords = [[0., 0., 0.], [0., 0., 1.21]]
     dioxygen_atomnos = [8, 8]
     dioxygen_mult = 3
-    dioxygen_mol = Atoms({
+    dioxygen = Atoms({
         'name': dioxygen_name,
         'atomcoords': dioxygen_atomcoords,
         'atomnos': dioxygen_atomnos,
@@ -277,7 +275,7 @@ def test_can_create_data_from_atoms():
     cyanide_atomcoords = [[0., 0., 0.], [0., 0., 1.136]]
     cyanide_atomnos = [7, 8]
     cyanide_charge = -1
-    cyanide_mol = Atoms({
+    cyanide = Atoms({
         'name': cyanide_name,
         'atomcoords': cyanide_atomcoords,
         'atomnos': cyanide_atomnos,
@@ -314,51 +312,57 @@ def test_can_create_data_from_atoms():
 
 
 def test_can_create_data_from_series():
-    """Test if we can create a data object from Series instances."""
-    pyrrole_path = 'data/pyrrole.out'
-    pyrrolate_path = 'data/pyrrolate.out'
+    """Test if we can create a data object from pandas.Series instances."""
+    pyrrole_path = 'data/pyrrolate/pyrrole.out'
+    pyrrolate_path = 'data/pyrrolate/pyrrolate.out'
 
     data1 = create_data(read_cclib(pyrrole_path), read_cclib(pyrrolate_path))
     data2 = create_data(read_cclib(pyrrole_path).to_series(),
                         read_cclib(pyrrolate_path).to_series())
 
-    for col in (set(data1.columns) | set(data2.columns)) - {"atomcharges"}:
+    for column in (set(data1.columns) | set(data2.columns)) - {"atomcharges"}:
         # WARNING: "atomcharges" is tricky to compare
         for i in {pyrrole_path, pyrrolate_path}:
             try:
-                assert_equal(data1.loc[i, col], data2.loc[i, col])
+                assert_equal(data1.loc[i, column], data2.loc[i, column])
             except ValueError:
                 try:
-                    assert_array_equal(data1.loc[i, col], data2.loc[i, col])
+                    assert_array_equal(data1.loc[i, column],
+                                       data2.loc[i, column])
                 except AssertionError:
                     try:
-                        assert_allclose(data1.loc[i, col], data2.loc[i, col])
+                        assert_allclose(data1.loc[i, column],
+                                        data2.loc[i, column])
                     except TypeError:
-                        for j, k in zip(data1.loc[i, col], data2.loc[i, col]):
+                        for j, k in zip(data1.loc[i, column],
+                                        data2.loc[i, column]):
                             assert_allclose(j, k)
 
 
 def test_can_create_data_from_dataframe():
     """Test if we can create a data object from a DataFrame instance."""
-    pyrrole_path = 'data/pyrrole.out'
-    pyrrolate_path = 'data/pyrrolate.out'
+    pyrrole_path = 'data/pyrrolate/pyrrole.out'
+    pyrrolate_path = 'data/pyrrolate/pyrrolate.out'
 
     data1 = create_data(read_cclib(pyrrole_path), read_cclib(pyrrolate_path))
     data2 = create_data(data1)
 
-    for col in (set(data1.columns) | set(data2.columns)) - {"atomcharges"}:
+    for column in (set(data1.columns) | set(data2.columns)) - {"atomcharges"}:
         # WARNING: "atomcharges" is tricky to compare
         for i in {pyrrole_path, pyrrolate_path}:
             try:
-                assert_equal(data1.loc[i, col], data2.loc[i, col])
+                assert_equal(data1.loc[i, column], data2.loc[i, column])
             except ValueError:
                 try:
-                    assert_array_equal(data1.loc[i, col], data2.loc[i, col])
+                    assert_array_equal(data1.loc[i, column],
+                                       data2.loc[i, column])
                 except AssertionError:
                     try:
-                        assert_allclose(data1.loc[i, col], data2.loc[i, col])
+                        assert_allclose(data1.loc[i, column],
+                                        data2.loc[i, column])
                     except TypeError:
-                        for j, k in zip(data1.loc[i, col], data2.loc[i, col]):
+                        for j, k in zip(data1.loc[i, column],
+                                        data2.loc[i, column]):
                             assert_allclose(j, k)
 
 
@@ -403,8 +407,8 @@ def test_can_create_data_from_special_dataframes():
 
 def test_create_data_without_names_indexed_filename():
     """Test if data object created without names is indexed by filenames."""
-    pyrrole_path = 'data/pyrrole.out'
-    pyrrolate_path = 'data/pyrrolate.out'
+    pyrrole_path = 'data/pyrrolate/pyrrole.out'
+    pyrrolate_path = 'data/pyrrolate/pyrrolate.out'
 
     data = create_data(read_cclib(pyrrole_path), read_cclib(pyrrolate_path))
     assert(pyrrole_path in data.index)
@@ -413,13 +417,13 @@ def test_create_data_without_names_indexed_filename():
 
 def test_create_data_from_ccframe_database():
     """Test can create data object from ccframe database."""
-    data = create_data(pd.read_hdf("data/data.h5"))
+    data = create_data(pd.read_hdf("data/acetate/data.h5"))
     assert_array_equal(
         data[["jobfilename", "freeenergy"]].values,
-        np.array([['data/acetate.out', -228.0004496],
-                  ['data/acetate@water.out', -228.12011268],
-                  ['data/acetic_acid.out', -228.56450866],
-                  ['data/acetic_acid@water.out', -228.57526805]],
+        np.array([['data/acetate/acetate.out', -228.0004496],
+                  ['data/acetate/acetate@water.out', -228.12011268],
+                  ['data/acetate/acetic_acid.out', -228.56450866],
+                  ['data/acetate/acetic_acid@water.out', -228.57526805]],
                  dtype=object))
 
     assert_equal(sorted(data.columns),
@@ -441,23 +445,24 @@ def test_create_data_from_ccframe_database_with_merge():
 
     assert_array_equal(
         data.reset_index()[
-            ["name", "jobfilename", "freeenergy", "random_column"]].values,
-        np.array([['acetate', 'data/acetate.out', -228.0004496, 'jubileu'],
-                  ['acetate@water', 'data/acetate@water.out', -228.12011268,
-                   'pica-pau'],
-                  ['acetic_acid', 'data/acetic_acid.out', -228.56450866,
-                   'rafael'],
-                  ['acetic_acid@water', 'data/acetic_acid@water.out',
-                   -228.57526805, "pantera cor de rosa"]],
+            ["name", "jobfilename", "freeenergy", "comment"]].values,
+        np.array([['AcO-(g)', 'data/acetate/acetate.out', -228.0004496,
+                   'acetate in gas phase'],
+                  ['AcO-(aq)', 'data/acetate/acetate@water.out',
+                   -228.12011268, 'acetate in water'],
+                  ['AcOH(g)', 'data/acetate/acetic_acid.out',
+                   -228.56450866, 'acetic acid in gas phase'],
+                  ['AcOH(aq)', 'data/acetate/acetic_acid@water.out',
+                   -228.57526805, "acetic acid in water"]],
                  dtype=object))
 
     assert_equal(sorted(data.columns),
                  ['atomcharges', 'atomcoords', 'atommasses', 'atomnos',
-                  'charge', 'coreelectrons', 'enthalpy', 'entropy',
+                  'charge', 'comment', 'coreelectrons', 'enthalpy', 'entropy',
                   'freeenergy', 'geotargets', 'geovalues', 'grads', 'homos',
                   'jobfilename', 'metadata', 'moenergies', 'moments', 'mult',
                   'natom', 'nbasis', 'nmo', 'optdone', 'pressure',
-                  'random_column', 'scfenergies', 'scftargets', 'scfvalues',
+                  'scfenergies', 'scftargets', 'scfvalues',
                   'temperature', 'vibdisps', 'vibfreqs', 'vibirs'])
 
 
@@ -470,23 +475,24 @@ def test_create_data_from_ccframe_database_with_merge_no_set_index():
 
     assert_array_equal(
         data.reset_index()[
-            ["name", "jobfilename", "freeenergy", "random_column"]].values,
-        np.array([['acetate', 'data/acetate.out', -228.0004496, 'jubileu'],
-                  ['acetate@water', 'data/acetate@water.out', -228.12011268,
-                   'pica-pau'],
-                  ['acetic_acid', 'data/acetic_acid.out', -228.56450866,
-                   'rafael'],
-                  ['acetic_acid@water', 'data/acetic_acid@water.out',
-                   -228.57526805, "pantera cor de rosa"]],
+            ["name", "jobfilename", "freeenergy", "comment"]].values,
+        np.array([['AcO-(g)', 'data/acetate/acetate.out', -228.0004496,
+                   'acetate in gas phase'],
+                  ['AcO-(aq)', 'data/acetate/acetate@water.out',
+                   -228.12011268, 'acetate in water'],
+                  ['AcOH(g)', 'data/acetate/acetic_acid.out',
+                   -228.56450866, 'acetic acid in gas phase'],
+                  ['AcOH(aq)', 'data/acetate/acetic_acid@water.out',
+                   -228.57526805, "acetic acid in water"]],
                  dtype=object))
 
     assert_equal(sorted(data.columns),
                  ['atomcharges', 'atomcoords', 'atommasses', 'atomnos',
-                  'charge', 'coreelectrons', 'enthalpy', 'entropy',
+                  'charge', 'comment', 'coreelectrons', 'enthalpy', 'entropy',
                   'freeenergy', 'geotargets', 'geovalues', 'grads', 'homos',
                   'jobfilename', 'metadata', 'moenergies', 'moments', 'mult',
                   'natom', 'nbasis', 'nmo', 'optdone', 'pressure',
-                  'random_column', 'scfenergies', 'scftargets', 'scfvalues',
+                  'scfenergies', 'scftargets', 'scfvalues',
                   'temperature', 'vibdisps', 'vibfreqs', 'vibirs'])
 
 
@@ -527,5 +533,3 @@ H         -0.69803       -0.09168        0.09337""",
                   """1
 
 H          1.72977       -0.08038        0.53387"""])
-
-

@@ -52,7 +52,7 @@ def test_can_make_chemical_equation_from_dict():
 
 
 def test_can_make_chemical_equation_from_series():
-    """Test if we can create chemical equation from Series."""
+    """Test if we can create chemical equation from pandas.Series."""
     equation1 = ChemicalEquation(pd.Series({'A(aq)': 4, 'B': 3,
                                             'C*': -2, 'D#': -1}),
                                  arrow='->')
@@ -80,7 +80,7 @@ def test_can_parse_printed_chemical_equation():
 
 
 def test_can_convert_chemical_equation_to_series():
-    """Test if we can convert chemical equation to series."""
+    """Test if we can convert chemical equation to pandas.Series."""
     data = create_data(read_cclib("data/acetate/acetic_acid.out", "AcOH(g)"),
                        read_cclib("data/acetate/acetic_acid@water.out",
                                   "AcOH(aq)"))
@@ -99,7 +99,7 @@ def test_can_convert_chemical_equation_to_series():
 
 
 def test_is_chemical_equation_to_series_consistent():
-    """Test if conversion of chemical equation to series is consistent."""
+    """Test if conversion of ChemicalEquation to pandas.Series is consistent."""  # noqa
     data = create_data(read_cclib("data/acetate/acetic_acid.out", "AcOH(g)"),
                        read_cclib("data/acetate/acetic_acid@water.out",
                                   "AcOH(aq)"))

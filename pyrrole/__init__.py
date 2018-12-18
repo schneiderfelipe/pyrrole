@@ -12,10 +12,10 @@ ChemicalEquation('NaCl(s) <=> Cl-(aq) + Na+(aq)')
 >>> ChemicalSystem('E + S <=> ES -> E + P')
 ChemicalSystem(["E + S <=> ES", "ES -> E + P"])
 
-`pyrrole.atoms` is also available:
+`atoms` is also available:
 
 >>> from pyrrole import atoms
->>> acetate = atoms.read_cclib("data/acetate.out", name="acetate")
+>>> acetate = atoms.read_cclib("data/acetate/acetate.out", "AcO-(g)")
 """
 
 from pyrrole import atoms  # noqa

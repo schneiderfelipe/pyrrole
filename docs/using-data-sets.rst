@@ -35,13 +35,13 @@ Pandas can read data sets in various formats, such as
 `Microsoft Excel <https://en.wikipedia.org/wiki/Microsoft_Excel>`_,
 and many `other supported format types <https://pandas.pydata.org/pandas-docs/stable/io.html>`_:
 
->>> data = pd.read_hdf("data/data.h5")
+>>> data = pd.read_hdf("data/acetate/data.h5")
 >>> data[['jobfilename', 'freeenergy', 'enthalpy']]
-                  jobfilename  freeenergy    enthalpy
-0            data/acetate.out -228.000450 -227.969431
-1      data/acetate@water.out -228.120113 -228.089465
-2        data/acetic_acid.out -228.564509 -228.533374
-3  data/acetic_acid@water.out -228.575268 -228.544332
+                          jobfilename  freeenergy    enthalpy
+0            data/acetate/acetate.out -228.000450 -227.969431
+1      data/acetate/acetate@water.out -228.120113 -228.089465
+2        data/acetate/acetic_acid.out -228.564509 -228.533374
+3  data/acetate/acetic_acid@water.out -228.575268 -228.544332
 
 Pyrrole requires indices to represent names of chemical species, which is, like above, not always the case.
 Setting meaningful indices can be accomplished by feeding a custom function to `data.apply`:
@@ -49,7 +49,7 @@ Setting meaningful indices can be accomplished by feeding a custom function to `
 >>> def update(series):
 ...     """Compute a new column 'name' and add it to row."""
 ...     series['name'] = (series['jobfilename']
-...                       .replace('data/', '')
+...                       .replace('data/acetate/', '')
 ...                       .replace('.out', ''))
 ...     series['name'] = (series['name']
 ...                       .replace('acetate', 'AcO-')
@@ -63,12 +63,12 @@ The function above should be applied to the `data` object, which can then be rei
 
 >>> data = data.apply(update, axis='columns').set_index('name')
 >>> data[['jobfilename', 'freeenergy', 'enthalpy']]  # doctest: +NORMALIZE_WHITESPACE
-                         jobfilename  freeenergy    enthalpy
+                                 jobfilename  freeenergy    enthalpy
 name
-AcO-(g)             data/acetate.out -228.000450 -227.969431
-AcO-(aq)      data/acetate@water.out -228.120113 -228.089465
-AcOH(g)         data/acetic_acid.out -228.564509 -228.533374
-AcOH(aq)  data/acetic_acid@water.out -228.575268 -228.544332
+AcO-(g)             data/acetate/acetate.out -228.000450 -227.969431
+AcO-(aq)      data/acetate/acetate@water.out -228.120113 -228.089465
+AcOH(g)         data/acetate/acetic_acid.out -228.564509 -228.533374
+AcOH(aq)  data/acetate/acetic_acid@water.out -228.575268 -228.544332
 
 The `data` object is now ready to be used:
 
@@ -89,7 +89,8 @@ In fact, the file ``data.h5`` used in the example above was produced using ccfra
 
 .. code-block:: console
 
-   $ ccframe -O data/data.h5 data/acetate*out data/acetic_acid*out
+   $ ccframe -O data/acetate/data.h5 data/acetate*out \
+                data/acetic_acid*out
 
 Learn more about ccframe in both its help page (``$ ccframe -h``) and `documentation <http://cclib.github.io/how_to_parse.html#ccframe>`_.
 
