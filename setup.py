@@ -2,7 +2,7 @@
 
 """Package setup script for pyrrole."""
 
-import os.path
+import os
 import setuptools
 from distutils.core import setup
 
@@ -18,6 +18,16 @@ download_url = \
 
 with open(os.path.join(this_directory, 'README.rst')) as f:
     long_description = f.read()
+
+install_requires = ["cclib>=1.5.3",
+                    "matplotlib>=2.1.1",
+                    "networkx>=2.1",
+                    "pandas>=0.23.4",
+                    "pyparsing>=2.2.0",
+                    "tables"]
+
+if os.environ.get('READTHEDOCS') != 'True':
+    install_requires.append("openbabel>=2.4.1")
 
 setup(name=name,
       version=version,
@@ -45,13 +55,7 @@ setup(name=name,
                 'research',
                 'chemistry'],
       packages=setuptools.find_packages(exclude=['*test*']),
-      install_requires=["cclib>=1.5.3",
-                        "matplotlib>=2.1.1",
-                        "networkx>=2.1",
-                        "openbabel>=2.4.1",
-                        "pandas>=0.23.4",
-                        "pyparsing>=2.2.0",
-                        "tables"],
+      install_requires=install_requires,
       setup_requires=['nose>=1.0'],
       test_suite='nose.collector',
       include_package_data=True,

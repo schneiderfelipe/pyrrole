@@ -9,9 +9,9 @@ pyrrole
    :target: https://travis-ci.org/dudektria/pyrrole
    :alt: Travis CI Status
 
-.. |docs-badge| image:: https://img.shields.io/badge/docs-pyrrole-blue.svg
+.. |docs-badge| image:: https://readthedocs.org/projects/pyrrole/badge/?version=latest
    :target: https://pyrrole.readthedocs.io/en/latest/?badge=latest
-   :alt: Latest Documentation
+   :alt: Latest Documentation Status
 
 |docs-badge| |build-badge| |pypi-badge|
 
