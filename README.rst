@@ -1,3 +1,7 @@
+**WARNING**: this project has been retired.
+Please migrate to
+`geem-lab/overreact <https://github.com/geem-lab/overreact>`_.
+
 pyrrole
 =======
 
